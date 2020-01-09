@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% block head %}
+{{ block.super }}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="{% static "/local_resources/app.js" %}"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div id="container">
+	  <div class="panel" id="legend">
+			<div class="panel-heading">Legend</div>
+			<div class="panel-body" id ="legend-body">
+			</div>
+      </div>
+      <div class="panel" id="features">
+			<div class="panel-heading">Channels</div>
+			<div class="panel-body">
+				<select id="myDropdown" name="myDropdown" class="dropdown-content">
+				<option selected="selected" id="select-default" disabled hidden>Channel</option>
+				</select>
+			<button type="button" class ="zoomButton" id="zoomButton">Full Extent</button> <!--onclick="resetView()"-->
+			</div>
+      </div>
+	  <div class="panel" id="graphs" data-scenarioid="{{ scenario_id }}" data-variableid="{{ variable_id }}">
+		<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-4">
+				<select id="myScenario" name="myScenario" class="dropdown-content">
+				<option selected="selected" id="select-default" disabled hidden>Baseline vs. ?</option>
+				</select>
+			</div>
+			<div class="col-sm-2"></div>
+			<div class="col-sm-3">
+				<select id="myVariable" name="myVariable" class="dropdown-content">
+				<option selected="selected" id="select-default" disabled hidden>Variable</option>
+				</select>
+			</div>
+			<div class="col-sm-1"></div>
+		</div>
+		<div class="row">
+			<div class="col-sm-8">
+				<div id="myGraph"></div>
+			</div>
+		</div>
+	  </div>	  
+      <div id="map"></div>
+    </div>	
+{% endblock %}

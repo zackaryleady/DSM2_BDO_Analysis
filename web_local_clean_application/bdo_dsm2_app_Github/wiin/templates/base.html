@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="">
+    <meta name="author" content="">
+	<!-- Title -->
+    <title>DSM2 Vis</title>
+  <!-- Local Links -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  {% load static %}
+	<link rel="stylesheet" href="{% static "/local_resources/bootstrap.min.css" %}">
+	<link rel="stylesheet" href="{% static "/local_resources/all.css" %}">
+	<link rel="stylesheet" href="{% static "/local_resources/leaflet.css" %}">
+	<link rel="stylesheet" href="{% static "/local_resources/MarkerCluster.css" %}">
+	<link rel="stylesheet" href="{% static "/local_resources/MarkerCluster.Default.css" %}">
+	<link rel="stylesheet" href="{% static "/local_resources/L.Control.Locate.min.css" %}">
+	<link rel="stylesheet" type="text/css" href="{% static "/local_resources/datatables.min.css" %}">
+	<link rel="stylesheet" href="{% static "/local_resources/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.css" %}">
+  <link rel="stylesheet" href="{% static "/local_resources/app.css" %}">
+  <!-- D3 Links -->	
+	<script src="{% static "/local_resources/d3.min.js" %}" charset="utf-8"></script>
+	<script src="{% static "/local_resources/topojson.min.js" %}"></script>
+	<script src="{% static "/local_resources/leaflet.js" %}"></script>
+	<!-- Icons -->
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static "/local_resources/img/favicon-76.png" %}">
+  <link rel="apple-touch-icon" sizes="120x120" href="{% static "/local_resources/img/favicon-120.png" %}">
+  <link rel="apple-touch-icon" sizes="152x152" href="{% static "/local_resources/img/favicon-152.png" %}">
+  <link rel="icon" sizes="196x196" href="{% static "/local_resources/img/favicon-196.png" %}">
+  <link rel="icon" type="image/x-icon" href="{% static "/local_resources/img/favicon.ico" %}">
+  </head>
+  <!-- Body Start -->
+  <body>
+  {% load static %}
+	<!-- Top Navbar -->
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <div class="navbar-icon-container">
+            <a href="#" class="navbar-icon pull-right visible-xs" id="nav-btn"><i class="fa fa-bars fa-lg white"></i></a>
+            <a href="#" class="navbar-icon pull-right visible-xs" id="sidebar-toggle-btn"><i class="fa fa-search fa-lg white"></i></a>
+          </div>
+          <a class="navbar-brand" href="{% url 'home' %}">Delta Modeling</a>
+        </div>
+        <div class="navbar-collapse collapse">
+
+		  <form class="navbar-form navbar-right" id="myInputs" data-runid="{{ run_id }}" >
+            <div class="form-group has-feedback">
+				<div class="row align-items-end">
+					<div class="col-sm-6">
+						<select id="myRun" name="myRun" class="dropdown-content">
+						<option selected="selected" id="select-default" disabled hidden>Select Model Run</option>
+						</select>
+					</div>					
+				</div>
+            </div>
+          </form>
+          <ul class="nav navbar-nav">
+            <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i class="fa fa-question-circle white"></i>&nbsp;&nbsp;About</a></li>
+            <li class="dropdown">
+              <a id="TablesDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fas fa-table"></i>&nbsp;&nbsp;Data Tables <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                  <li><a href="{% url 'summary_table' %}" data-toggle="collapse" data-target=".navbar-collapse.in" id="tables-btn">&nbsp;&nbsp; Full Forecast Summary</a></li>
+                  <li><a href="{% url 'summary5_table' %}" data-toggle="collapse" data-target=".navbar-collapse.in" id="tables-btn">&nbsp;&nbsp; 5-Day Summary</a></li>
+                  <li><a href="{% url 'summary14_table' %}" data-toggle="collapse" data-target=".navbar-collapse.in" id="tables-btn">&nbsp;&nbsp; 14-Day Summary</a></li>
+                  <li><a href="{% url 'mfcn_table' %}" data-toggle="collapse" data-target=".navbar-collapse.in" id="tables-btn">&nbsp;&nbsp; Mean Flow - Channel Node</a></li>
+                  <li><a href="{% url 'mvcn_table' %}" data-toggle="collapse" data-target=".navbar-collapse.in" id="tables-btn">&nbsp;&nbsp; Mean Velocity - Channel Node</a></li>          
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+	
+	<div id="container">
+	  {% block content %}
+	  {% endblock %}
+    </div>
+
+	<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Welcome to the Delta Hydrodynamics Visualization Tool!</h4>
+          </div>
+          <div class="modal-body">
+            <ul class="nav nav-tabs nav-justified" id="aboutTabs">
+              <li class="active"><a href="#about" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;About the tool</a></li>
+              <li><a href="#contact" data-toggle="tab"><i class="fa fa-envelope"></i>&nbsp;Contact us</a></li>
+              <li><a href="#disclaimer" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Disclaimer</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe"></i>&nbsp;Metadata <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#DSM2info-tab" data-toggle="tab">DSM2</a></li>
+                  <li><a href="#DHAinfo-tab" data-toggle="tab">Delta Hydrodynamics App</a></li>
+                </ul>
+              </li>
+            </ul>
+            <div class="tab-content" id="aboutTabsContent">
+              <div class="tab-pane fade active in" id="about">
+                <p>The values in this visualization tool are outputs from the Delta Simulation Model II (DSM2) Hydro & Particle Tracking Model (PTM). DSM2 is a one-dimensional hydrodynamic model capable of simulating stage, flow, and velocity as specifically applied to the San Francisco Bay-Delta channel network. The PTM serves to simulate the effects of flow/velocity on larval/juvenile salmonids in relation to different flexible operation regimes. In this visualization, the analysis is focused on scenario comparisons to allow for flexible operations of the CVP during storm events as detailed in the WIIN Act.</p>
+              </div>
+              <div id="disclaimer" class="tab-pane fade text-danger">
+                <p>The data provided on this site is for informational and planning purposes only.</p>
+                <p>Absolutely NO accuracy or completeness guarantee is implied or intended. All information on this SITE is subject to variations and corrections.</p>
+              </div>
+              <div class="tab-pane fade" id="contact">
+                <p> Please email Zackary Leady for questions or comments regarding this application at zleady@usbr.gov </p>
+              </div>
+              <div class="tab-pane fade" id="DSM2info-tab">
+                <p>DSM2 Model courtesy of <a href="http://baydeltaoffice.water.ca.gov/modeling/deltamodeling/models/dsm2/dsm2.cfm" target="_blank">California Department of Water Resources.</a></p>
+              </div>
+              <div class="tab-pane fade" id="DHAinfo-tab">
+                <p>Adapted from a <a href="https://fishsciences.shinyapps.io/delta-hydrodynamics/" target="_blank">web app</a> created by <a href="https://www.fishsciences.net/" target="_blank">Cramer Fish Sciences</a>.</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+	
+    <div class="modal fade" id="featureModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title text-primary" id="feature-title"></h4>
+          </div>
+          <div class="modal-body" id="feature-info"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade" id="attributionModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">
+              Developed by <a href='#'>Zackary Leady</a>
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div id="attribution"></div>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+	
+
+	<!-- JS Links-->
+	<script type="text/javascript" charset="utf8" src="{% static "/local_resources/jquery-3.3.1.min.js" %}"></script>
+	<script src="{% static "/local_resources/bootstrap.min.js" %}"></script>
+	<script src="{% static "/local_resources/all.js" %}"></script>
+  <script src="{% static "/local_resources/leaflet.markercluster.js" %}"></script>
+	<script src="{% static "/local_resources/L.Control.Locate.min.js" %}"></script>
+  <script src="{% static "/local_resources/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js" %}"></script>
+  <script src="{% static "/local_resources/app.js" %}"></script>
+	</body>
+</html>
